@@ -2492,19 +2492,6 @@ c     evaluate the interpolant.
      &         ercoef(ibasm), work(iliu), work(ilium), work(iusol2))
       endif
 
-c     Zero out (the work array) solutions used for error approximation
-      do k = 1 , npde - nu
-         do i = iusol1 , iusol1+npde*(quad*nint) - npde , npde
-           j = i + k
-           work(j) = zero
-        enddo
-      enddo
-      do k = 1 , npde - nu
-         do i = iusol2 , iusol2+npde*(quad*nint) - npde , npde
-           j = i + k
-           work(j) = zero
-        enddo
-      enddo
 
 c-----------------------------------------------------------------------
 c     Initialization task.
