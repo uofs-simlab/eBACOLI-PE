@@ -2221,12 +2221,14 @@ c-----------------------------------------------------------------------
       parameter (lnint  = 19)
       parameter (lipvt  = 23)
       parameter (iework = 50)
+      parameter (inpde_sub =  17)
 c-----------------------------------------------------------------------
 C
 C***FIRST EXECUTABLE STATEMENT  DDAJAC
       IER = 0
       NPDM1=NPD-1
       MTYPE=IWM(LMTYPE)
+      ! print*, MTYPE
 c-----------------------------------------------------------------------
       npde   = iwm(lnpde)
       kcol   = iwm(lkcol)
@@ -2422,8 +2424,22 @@ c                 This is for the middle columns of each block.
       enddo
 
 c     Scale the algebraic equations to improve conditioning.
-      call dscal(siztop, cj, wm(npd), 1)
-      call dscal(sizbot, cj, wm(npdbt1), 1)
+      do i = 1, ipar(inpde_sub)
+         call dscal(wdhtop, cj, wm(npd-1+i), npde)
+         call dscal(wdhbot, cj, wm(npdbt1-1+i), npde)
+      end do
+      do i = ipar(inpde_sub)+ipar(inpde_sub+1)+1, npde
+         call dscal(wdhtop, cj, wm(npd-1+i), npde)
+         call dscal(wdhbot, cj, wm(npdbt1-1+i), npde)
+      end do
+
+      nu = ipar(inpde_sub)
+      nv = ipar(inpde_sub+1)
+      do n = nu + nv+1, npde
+         nn = n
+         call dscal(kcol*npde*(kcol+nconti)*nint, cj, 
+     &   wm(npdbk1-1+nn),npde)
+      end do
 
   390 continue
 

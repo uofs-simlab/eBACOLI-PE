@@ -3807,14 +3807,14 @@ c     Evaluate left BC, stores in work(idelta)
       call bndxa(t0, work(iu), work(iux), work(idelta), npde)
 c     Evaluate derivative of left BC, store in
 c       work(idbdu), work(idbdux), work(idbdut)
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t0, work(iu), work(iux), work(idbdu),
-c$$$     &        work(idbdux), work(idbdt), npde,
-c$$$     &        bndxa, work(ifdwrk))
-c$$$      else
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t0, work(iu), work(iux), work(idbdu),
+     &        work(idbdux), work(idbdt), npde,
+     &        bndxa, work(ifdwrk))
+      else
       call difbxa(t0, work(iu), work(iux), work(idbdu),
      &        work(idbdux), work(idbdt), npde)
-c$$$      end if
+      end if
 
 c     Set up the top block (Parabolic and Elliptic parts) and save in work(iabdtp).
       do 150 j = 1, npde
@@ -3860,14 +3860,14 @@ c     Evaluate right BC, stores in work(idelta)
       call bndxb(t0, work(iu), work(iux), work(idelta+neq-npde), npde)
 c     Evaluate derivative of right BC, store in
 c       work(idbdu), work(idbdux), work(idbdut)
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t0, work(iu), work(iux), work(idbdu),
-c$$$     &        work(idbdux), work(idbdt), npde,
-c$$$     &        bndxb, work(ifdwrk))
-c$$$      else
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t0, work(iu), work(iux), work(idbdu),
+     &        work(idbdux), work(idbdt), npde,
+     &        bndxb, work(ifdwrk))
+      else
       call difbxb(t0, work(iu), work(iux), work(idbdu),
      &        work(idbdux), work(idbdt), npde)
-c$$$      end if
+      end if
 
 c     Set up the bottom block (Parabolic and Elliptic parts) and save in work(iabdbt).
       do 170 j = 1, npde
@@ -4177,14 +4177,14 @@ c-----------------------------------------------------------------------
 c     Update the values at the left boundary.
       call eval(npde,kcol,kcol+2,1,ncpts,work(iu),work(iux),
      &          work(iuxx),fbasis(1,1,1),y)
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t0, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde,
-c$$$     &               bndxa, work(ifdwrk))
-c$$$      else
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t0, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde,
+     &               bndxa, work(ifdwrk))
+      else
       call difbxa(t0, work(iu), work(iux), work(idbdu),
      &               work(idbdux), work(idbdt), npde)
-c$$$      end if
+      end if
 
 c     Set up the PDE part of the top block and save in abdtop.
       do 120 j = 1, npde
@@ -4270,14 +4270,14 @@ c-----------------------------------------------------------------------
 c     Update the values at the right boundary.
       call eval(npde,kcol,ncpts,ncpts,ncpts,work(iu),work(iux),
      &          work(iuxx),fbasis(1,1,ncpts),y)
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t0, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde,
-c$$$     &               bndxb, work(ifdwrk))
-c$$$      else
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t0, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde,
+     &               bndxb, work(ifdwrk))
+      else
       call difbxb(t0, work(iu), work(iux), work(idbdu),
      &               work(idbdux), work(idbdt), npde)
-c$$$      end if
+      end if
 
 c     Set up the bottom block (PDE part) and save in abdbot.
       do 170 j = 1, npde
@@ -5813,18 +5813,18 @@ c     update part of the PD_BOT that is related to the ODEs
 c     Update the part of TOP related to the PDE only
       call eval(npde, kcol, kcol+2, 1, ncpts, work(iu), work(iux),
      &     work(iuxx), fbasis(1), y)
-      call difbxa(t, work(iu), work(iux), work(idbdu),
-     &     work(idbdux), work(idbdt), npde)
+c      call difbxa(t, work(iu), work(iux), work(idbdu),
+c     &     work(idbdux), work(idbdt), npde)
 
 c  COMMENTED OUT FOR NOW. WE DO NOT WANT FD BC derivatives
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde,
-c$$$     &               bndxa, work(ifdwrk))
-c$$$      else
-c$$$         call difbxa(t, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde)
-c$$$      end if
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde,
+     &               bndxa, work(ifdwrk))
+      else
+         call difbxa(t, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde)
+      end if
 
 c     Update the top block of the collocation matrix dG/dY'.
       do 90 j = 1, npde
@@ -5856,14 +5856,14 @@ c     Update the part of BOT related to the PDE only
      &            work(idbdux), work(idbdt), npde)
 
 c  COMMENTED OUT FOR NOW. WE DO NOT WANT FD BC derivatives
-c$$$      if (ifgfdj .lt. 2) then
-c$$$         call fdbndx(t, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde,
-c$$$     &               bndxb, work(ifdwrk))
-c$$$      else
-c$$$         call difbxb(t, work(iu), work(iux), work(idbdu),
-c$$$     &               work(idbdux), work(idbdt), npde)
-c$$$      end if
+      if (ifgfdj .lt. 2) then
+         call fdbndx(t, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde,
+     &               bndxb, work(ifdwrk))
+      else
+         call difbxb(t, work(iu), work(iux), work(idbdu),
+     &               work(idbdux), work(idbdt), npde)
+      end if
 
 c     Update the bottom block of the collocation matrix.
       do 110 j = 1, npde
