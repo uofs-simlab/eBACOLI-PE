@@ -1735,7 +1735,7 @@ c-----------------------------------------------------------------------
 
       if (idid .le. 0) goto 600
 
-      call errest(kcol, nint, npde, nu, neq, necpts, icount,
+      call errest(kcol, nint, npde, nu, nw, neq, necpts, icount,
      &            rpar(ipar(iexcol)), rpar(ipar(iewts)),
      &            rpar(ipar(ixbs)), rpar(ipar(iey)), istart,
      &            mflag(2), atol, rtol, lenerr, rpar(ipar(iework)),
@@ -2126,7 +2126,7 @@ c     the values of the basis function at the required point.
       return
       end
 
-      subroutine errest(kcol, nint, npde, nu, neq, npts, icount,
+      subroutine errest(kcol, nint, npde, nu, nw, neq, npts, icount,
      &                  xsol, wts, xbs, y, istart, mflag2, atol,
      &                  rtol, lenwk, work, errbas, ercoef, lencof,
      &                  errrat, errint, errcom, ieflag, x, h, est)
@@ -2213,6 +2213,11 @@ c
 c                               nu is the number of components in the
 c                               subsystem of parabolic PDEs:
 c                               0 < nu <= npde.
+c
+        integer                 nw
+c                               nw is the number of components in the
+c                               subsystem of elliptic PDEs:
+c                               0 < nw <= npde.
 c
         integer                 neq
 c                               neq=npde*(nint*kcol+nconti) is the
@@ -2492,7 +2497,22 @@ c     evaluate the interpolant.
      &         ercoef(ibasm), work(iliu), work(ilium), work(iusol2))
       endif
 
+c     Zero out (the work array) solutions used for error approximation
+      do k = 1 , npde - nu - nw
+         do i = iusol1 , iusol1+npde*(quad*nint) - npde , npde
+           j = i + k
+           work(j) = zero
+c           print*, j
+        enddo
+      enddo
+      do k = 1 , npde - nu - nw
+         do i = iusol2 , iusol2+npde*(quad*nint) - npde , npde
+           j = i + k
+           work(j) = zero
+c           print*, 2507, j
 
+        enddo
+      enddo
 c-----------------------------------------------------------------------
 c     Initialization task.
       do 10 i = 1, nint
