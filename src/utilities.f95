@@ -90,6 +90,44 @@ subroutine write_discrete_L2_error(sol,truu,npoints)
 end subroutine write_discrete_L2_error
 
 
+subroutine write_discrete_LInf_error(sol,truu,npoints)
+
+  ! Computes the discrete LInf error of the solution at npoints equally spaced
+  ! points. Writes the result to screen
+
+  use ebacoli95_mod, only: ebacoli95_sol, ebacoli95_vals
+
+  implicit none
+
+  type(ebacoli95_sol) :: sol
+  integer npoints
+
+  ! Declare output points and output solution values arrays
+  double precision :: xout(npoints), uout(sol%npde*npoints), uactual(sol%npde*npoints)
+
+  double precision error
+
+  integer i, ij, k
+
+  ! Compute the discrete LInf error relative to known solution truu(t,x)
+
+  ! Solution at uniformly spaced coordinates
+  xout = (/(sol%x(1)+i*(sol%x(sol%nint+1)-sol%x(1))/(npoints-1), i=0,npoints-1)/)
+  call ebacoli95_vals(sol, xout, uout)
+
+  error = 0
+  do i = 1, npoints
+     ij = 1+(i-1)*sol%npde
+     call truu(sol%t0,xout(i),uactual(ij),sol%npde)
+  end do
+
+  error = maxval(uactual-uout)
+
+  write(*,*) "Discrete LInf error at output points:", error
+
+end subroutine write_discrete_LInf_error
+
+
 ! Timing routines
 subroutine tic(t1)
   implicit none
