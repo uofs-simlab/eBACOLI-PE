@@ -121,7 +121,7 @@ subroutine write_discrete_LInf_error(sol,truu,npoints)
      call truu(sol%t0,xout(i),uactual(ij),sol%npde)
   end do
 
-  error = maxval(uactual-uout)
+  error = maxval(abs(uactual-uout))
 
   write(*,*) "Discrete LInf error at output points:", error
 

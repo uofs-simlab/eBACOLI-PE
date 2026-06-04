@@ -5480,10 +5480,10 @@ c       Loop indices:
         integer                 m
         integer                 n
 c
-        integer                 ii
+        integer                 ii, ii_u
         integer                 ij
-        integer                 jj
-        integer                 kk
+        integer                 jj, jj_u
+        integer                 kk, kk_u
         integer                 nn
         integer                 mm
         integer                 jk
@@ -5623,6 +5623,7 @@ c     calculate the portion of dG/dY which depends on them.
 c        ii+1 is the pointer to the first element at the i-th subblock
 c        of the jacobian matrix, i = 1, nint.
          ii = ipdblk - 1 + (i - 1) * nsizbk
+         ii_u = (i - 1) * nsizbk
 
 c        ij is the value of ileft for the current collocation point.
          ij = kcol + nconti + (i - 1) * kcol
@@ -5632,9 +5633,11 @@ c        ij is the value of ileft for the current collocation point.
 c           jj+1 is the pointer to the first element corresponding to
 c           the j-th collocation point in the i-th interval.
             jj = ii + (j - 1) * npde
+            jj_u = ii_u + (j - 1) * npde
 
 c           mm is the index of the current collocation point.
             mm = (i - 1) * kcol + j + 1
+
 
 c           Generate the approximate solution and its spatial
 c           derivatives at the current collocation point.
@@ -5655,6 +5658,7 @@ c              npde submatrix, which is corresponding to the j-th
 c              collocation point in the i-th interval, and the k-th
 c              nonzero basis function.
                kk = jj + (k-1) * npde * npde * kcol
+               kk_u = jj_u + (k-1) * npde * npde * kcol
 
 c              jk is the pointer to the k-th nonzero function at the
 c              mm-th collocation point in the basis function,
@@ -5692,69 +5696,13 @@ c                    now set up the value in pd at the place nn.
 
    30             continue
    40          continue
-   50       continue
-   60    continue
-   70 continue
-
-
-c     Elliptic interior blocks are done in place in abdblk
-      do 79 i = 1, nint
-
-c        ii+1 is the pointer to the first element at the i-th subblock
-c        of the jacobian matrix, i = 1, nint.
-         ii = (i - 1) * nsizbk
-
-c        ij is the value of ileft for the current collocation point.
-         ij = kcol + nconti + (i - 1) * kcol
-
-         do 69 j = 1, kcol
-
-c           jj+1 is the pointer to the first element corresponding to
-c           the j-th collocation point in the i-th interval.
-            jj = ii + (j - 1) * npde
-
-c           mm is the index of the current collocation point.
-            mm = (i - 1) * kcol + j + 1
-
-c           Generate the approximate solution and its spatial
-c           derivatives at the current collocation point.
-            call eval(npde,kcol,ij,mm,ncpts,work(iu),work(iux),
-     &                work(iuxx),fbasis(1+(mm-1)*(kcol+nconti)*3),y)
-
-c           Generate dfdu, dfdux, and dfdux at the current
-c           collocation point (the j-th point of the i-th
-c           subinterval).
-            call derivf(t, xcol(1+(i-1)*kcol+j), work(iu),
-     &                  work(iux), work(iuxx), work(idfdu),
-     &                  work(idfdux), work(idfuxx), npde)
-
-            do 59 k = 1, kcol + nconti
-
-c              kk+1 is the pointer to the first element of a npde by
-c              npde submatrix, which is corresponding to the j-th
-c              collocation point in the i-th interval, and the k-th
-c              nonzero basis function.
-               kk = jj + (k-1) * npde * npde * kcol
-
-c              jk is the pointer to the k-th nonzero function at the
-c              mm-th collocation point in the basis function,
-c              fbasis(1).
-               jk = (mm - 1) * (kcol + nconti) * 3 + k
-
-c              jk2 is the pointer to the first derivative for the
-c              above basis function.
-               jk2 = jk + kcol + nconti
-
-c              jk3 is the pointer to the second derivative for the
-c              above basis function.
-               jk3 = jk2 + kcol + nconti
-
+c              Elliptic interior blocks are done in place in abdblk
                do 49 m = 1, npde
                   do 39 n = nu+nv+1, nu+nv+nw
 
 c                    nn is the pointer to the (n, m) element of the
 c                    npde by npde submatrix.
-                     nn = kk + (m-1)*npde*kcol + n
+                     nn = kk_u + (m-1)*npde*kcol + n
 
 c                    mn is the pointer to the (n, m) element of dfdu.
                      mn = idfdu - 1 + (m - 1) * npde + n
@@ -5772,9 +5720,10 @@ c                    now set up the value in abdblk at the place nn.
 
  39               continue
  49            continue
- 59         continue
- 69      continue
- 79   continue
+
+   50       continue
+   60    continue
+   70 continue
 
 c-----------------------------------------------------------------------
 c     Update part of the PD_TOP that is related to the ODEs
@@ -5872,8 +5821,8 @@ c-----------------------------------------------------------------------
 c     Update the part of BOT related to the PDE only
       call eval(npde, kcol, ncpts, ncpts, ncpts, work(iu), work(iux),
      &          work(iuxx), fbasis(1+(ncpts-1)*(kcol+nconti)*3), y)
-      call difbxb(t, work(iu), work(iux), work(idbdu),
-     &            work(idbdux), work(idbdt), npde)
+c      call difbxb(t, work(iu), work(iux), work(idbdu),
+c     &            work(idbdux), work(idbdt), npde)
 
 c  COMMENTED OUT FOR NOW. WE DO NOT WANT FD BC derivatives
       if (ifgfdj .lt. 2) then
