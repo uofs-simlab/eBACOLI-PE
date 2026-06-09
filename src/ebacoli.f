@@ -2619,11 +2619,9 @@ c     Decide whether remeshing is needed.
       ieflag = 0
 
 c     Zero out the error computed for the ODE subsystem (FOR TESTING)
-      if (ienoode .eq. 1) then
-         do i = nu+1, npde
+         do i = nu+1, npde-nw
             errcom(i)=0
          enddo
-      endif
 
 c     update errrat (the max of errcom.)
       errrat = zero
